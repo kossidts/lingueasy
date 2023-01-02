@@ -3,7 +3,7 @@
  * or return an empty string if the provided string does not match the format of locals
  *
  * i.e
- * input -> output (output with short=false)
+ * input -> output (output in case short !== true)
  * de    -> de (de_DE)
  * en    -> en (en_EN)
  * en-us -> en (en_US)

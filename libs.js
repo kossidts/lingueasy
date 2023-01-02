@@ -1,7 +1,53 @@
-//
+// Cache the translating functions for efficiency
+const translators = new Map();
 
-const localizations = {
-};
+/**
+ * Create translating functions
+ * @param {string} lang the target language
+ * @param {object} localizations The translation object
+ * @returns {array} An array of translation functions
+ */
+function create_translators(lang, localizations) {
+    if (translators.has(lang)) {
+        return translators.get(lang);
+    }
+    /**
+     * Translate a given string
+     * @param {string} str The string to translate
+     * @returns {string} The translated string of the original string in case the translation is missing
+     */
+    const __ = str => {
+        localizations[lang]?.[str] || str;
+    };
+
+    /**
+     * Translate a tring with placeholders
+     * @param {string} str The string to translate containing placeholders
+     * @param {...any} args List of values for the placeholders
+     * @returns {string} The translates string with values in place
+     *
+     * @usage
+     * _f('You must be %s years old', 18)
+     * is the same as __('You must be %s years old').replace('%s', 18)
+     * but is more powerful
+     *
+     * _f('Mr. %2$s %1$s is %3$s years old.', firstname, lastname, age)
+     *
+     */
+    const _f = (str, ...args) => {
+        let formatted = __(str).replace(/(%(?:(\d+)\$)?[s|d|f])/g, function (_, p1, p2) {
+            let index = ~~p2 > 0 ? ~~p2 - 1 : 0;
+
+            return args[index];
+        });
+
+        return formatted;
+    };
+
+    let _translators = translators.set(lang, [__, _f]);
+
+    return _translators;
+}
 
 /**
  * An express middleware that detects the current user preferred lang

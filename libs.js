@@ -13,10 +13,11 @@ const localizations = {
 const localizer = (req, res, next) => {
     // TODO skip routes that do not need translation: check req.originalUrl and return next() on match
 
-    let lang = req.session?.lang;
-    if (!lang) {
-        lang = req.acceptsLanguages(...Object.keys(localizations));
-    }
+    /**
+     * Retrieve the current users preferred language from the session.
+     * If not available, use one of the avalaible translation language that the users browser supports.
+     */
+    let lang = req.session?.lang || req.acceptsLanguages(...Object.keys(localizations));
 
     lang = sanitizeLocal(lang, true);
 

@@ -1,3 +1,26 @@
+const appRoot = require("app-root-path");
+const real_typeof = require("@kdts/real-typeof");
+
+const pkg = require("./package.json");
+const defaultConfig = require("./default.config.js");
+
+function mergeConfigs() {
+    let config = null;
+    try {
+        config = require(`${appRoot}/${pkg.name}.config.js`);
+    } catch (error) {}
+
+    // Merge the config with the default configs
+    config = Object.assign({}, defaultConfig, config);
+    config.exclude_dirs = [...new Set(config.exclude_dirs.concat(defaultConfig.exclude_dirs))];
+    config.exclude_files = [...new Set(config.exclude_files.concat(defaultConfig.exclude_files))];
+    config.includes_files = [...new Set(config.includes_files.concat(defaultConfig.includes_files))];
+    config.localizations = {};
+
+    // en: {}, // require locals /languages/locals/en.json
+    return config;
+}
+
 // Cache the translating functions for efficiency
 const translators = new Map();
 

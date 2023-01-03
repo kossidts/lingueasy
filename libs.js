@@ -73,36 +73,50 @@ function create_translators(lang, localizations) {
 }
 
 /**
- * An express middleware that detects the current user preferred lang
+ * Return an express middleware that detects the current user preferred lang and sets the appropriates translation functions
  *
- * @param {Request} req
- * @param {Response} res
- * @param {next} next
+ * @param {object} localizations
+ * @returns {function} Express middleware
  */
-const localizer = (req, res, next) => {
-    // TODO skip routes that do not need translation: check req.originalUrl and return next() on match
-
-    /**
-     * Retrieve the current users preferred language from the session.
-     * If not available, use one of the avalaible translation language that the users browser supports.
-     */
-    let lang = req.session?.lang || req.acceptsLanguages(...Object.keys(localizations));
-
-    lang = sanitizeLocal(lang, true);
-
-    const [__, _f] = create_translators(lang, localizations);
-
-    req.app.locals.lingueasy = {
-        lang,
-        __,
-        _f,
+function create_localizer_middleware(config) {
+    const localizations = config.localizations;
+    const exclude_paths = [...new Set(config.exclude_paths)]; //array of paths (regExp or string) to exlucde
+    const is_excluded = route => {
+        for (const path of exclude_paths) {
+            if (path === route || (real_typeof(path) == "regexp" && path.test(route))) {
+                return true;
+            }
+        }
+        return false;
     };
+    return (req, res, next) => {
+        // Skip if the current route is excluded from being translated
+        if (exclude_paths.length && is_excluded(req.originalUrl)) {
+            return next();
+        }
 
-    req.app.locals.__ = __;
-    req.app.locals._f = _f;
+        /**
+         * Retrieve the current users preferred language from the session.
+         * If not available, use one of the avalaible translation language that the users browser supports.
+         */
+        let lang = req.session?.lang || req.acceptsLanguages(...Object.keys(localizations));
 
-    next();
-};
+        lang = sanitizeLocal(lang, true);
+
+        const [__, _f] = create_translators(lang, localizations);
+
+        req.app.locals.lingueasy = {
+            lang,
+            __,
+            _f,
+        };
+
+        req.app.locals.__ = __;
+        req.app.locals._f = _f;
+
+        next();
+    };
+}
 
 /**
  * Sanitizes a given string into a local name (e.g. en_GB, en, fr_FR, fr, de_DE...)
@@ -146,5 +160,7 @@ function sanitizeLocal(local, short = true) {
 }
 
 module.exports = {
+    create_localizer_middleware,
+    mergeConfigs,
     sanitizeLocal,
 };

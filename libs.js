@@ -67,6 +67,17 @@ const localizer = (req, res, next) => {
 
     lang = sanitizeLocal(lang, true);
 
+    const [__, _f] = create_translators(lang, localizations);
+
+    req.app.locals.lingueasy = {
+        lang,
+        __,
+        _f,
+    };
+
+    req.app.locals.__ = __;
+    req.app.locals._f = _f;
+
     next();
 };
 

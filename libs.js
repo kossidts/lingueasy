@@ -133,7 +133,7 @@ function create_localizer_middleware(config) {
  * @returns {string}
  */
 function sanitizeLocal(local, short = true) {
-    if (typeof local !== "string") {
+    if (real_typeof(local) !== "string") {
         return "";
     }
     local = local.trim();

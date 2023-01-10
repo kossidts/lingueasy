@@ -1,3 +1,5 @@
+const path = require("node:path");
+const fs = require("node:fs/promises");
 const { exec } = require("node:child_process");
 
 const appRoot = require("app-root-path");
@@ -26,13 +28,19 @@ function bash_promise(cmd) {
 }
 
 const cli = {};
+
+/**
+ * Greps translatable files i.e. files containing translation functions like __(), _f()
+ * and generates the translation templates
+ */
 async function create_l10n() {
     const config = mergeConfigs();
+    const projectRootPath = "" + appRoot; //TODO: This is temp for testing
     let command = "grep -rlE ";
-    command += ` --exclude-dir={${config.localization.exclude_dirs.join(",")}}`;
-    command += ` --exclude={${config.localization.exclude_files.join(",")}}`;
-    command += ` --include={${config.localization.includes_files.join(",")}}`;
-    command += ` "_[_f]\\(" ${appRoot}`;
+    command += ` --exclude-dir={${config.exclude_dirs.join(",")}}`;
+    command += ` --exclude={${config.exclude_files.join(",")}}`;
+    command += ` --include={${config.includes_files.join(",")}}`;
+    command += ` "_[_f]\\(" ${projectRootPath}`;
     const [cmdError, cmdResults] = await resolver(bash_promise(command));
     if (cmdError) {
         throw cmdError;
@@ -79,10 +87,9 @@ async function create_l10n() {
                 return lineObj;
             })
             // remove unnecessary lines
-            .filter(({ line }) => /\_[\_|f]\(/.text(line));
+            .filter(({ line }) => /\_[\_|f]\(/.test(line));
 
-        // TODO: Verify the path
-        let relativeFilePath = path.relative(pathProjectRoot, file);
+        let relativeFilePath = path.relative(projectRootPath, file);
 
         lines.forEach(entry => {
             while ((match = re.exec(entry.line)) != null) {
@@ -97,9 +104,10 @@ async function create_l10n() {
     // TODO translform the l10nCollection into a pot template
     // TODO translform the l10nCollection into a json template
 
-    console.log(config);
-    console.log(command);
-    console.log(files);
+    // console.log(config);
+    // console.log(command);
+    // console.log(files);
+    console.log(l10nCollection);
 }
 
 create_l10n();

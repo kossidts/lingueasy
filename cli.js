@@ -35,6 +35,14 @@ const cli = {};
  */
 async function create_l10n() {
     const config = mergeConfigs();
+
+    // Return an error if a the language dir cannot be created
+    const [createDirError] = await resolver(fs.mkdir(config.path_to_translations_dir, { recursice: true }));
+    if (createDirError && createDirError.code !== "EEXIST") {
+        // throw createDirError;
+        return console.error(createDirError);
+    }
+
     const projectRootPath = "" + appRoot; //TODO: This is temp for testing
     let command = "grep -rlE ";
     command += ` --exclude-dir={${config.exclude_dirs.join(",")}}`;

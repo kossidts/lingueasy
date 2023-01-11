@@ -51,7 +51,7 @@ async function create_l10n() {
     command += ` "_[_f]\\(" ${projectRootPath}`;
     const [cmdError, cmdResults] = await resolver(bash_promise(command));
     if (cmdError) {
-        throw cmdError;
+        return console.error(cmdError);
     }
     // Remove empty entries
     const files = cmdResults.split(/\r?\n/).filter(Boolean);

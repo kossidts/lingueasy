@@ -118,8 +118,8 @@ async function create_l10n() {
         return acc;
     }, "");
 
-    let pathL10nPot = path.join(config.path_to_translations_dir, "translation.pot");
-    let [potError] = await resolver(fs.writeFile(pathL10nPot, l10nPot));
+    const pathL10nPot = path.join(config.path_to_translations_dir, "translation.pot");
+    const [potError] = await resolver(fs.writeFile(pathL10nPot, l10nPot));
 
     if (potError) {
         return console.error(potError);

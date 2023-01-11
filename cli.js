@@ -110,6 +110,20 @@ async function create_l10n() {
     }
 
     // TODO translform the l10nCollection into a pot template
+    let l10nPot = l10nCollection.reduce((acc, cur) => {
+        acc += `#: ${cur.lineNumber}\n`;
+        acc += `msgid "${cur.text}"\n`;
+        acc += `msgstr ""\n`;
+        acc += "\n";
+        return acc;
+    }, "");
+
+    let pathL10nPot = path.join(config.path_to_translations_dir, "translation.pot");
+    let [potError] = await resolver(fs.writeFile(pathL10nPot, l10nPot));
+
+    if (potError) {
+        return console.error(potError);
+    }
     // TODO translform the l10nCollection into a json template
 
     // console.log(config);

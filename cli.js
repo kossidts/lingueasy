@@ -124,9 +124,23 @@ async function create_l10n() {
     if (potError) {
         return console.error(potError);
     }
-    // TODO translform the l10nCollection into a json template
+    /**
+     * Translform the l10nCollection into a json template
+     *
+     * Retrieve the text to be translated, remove duplicates, sort them alphebetically,
+     * JSON.strigify and store the result into as json file
+     */
+    let l10nJson = new Set(l10nCollection.map(obj => obj.text));
+    l10nJson = [...l10nJson].sort().map(key => [key, ""]);
+    l10nJson = Object.fromEntries(l10nJson);
+    l10nJson = JSON.stringify(l10nJson, null, 4);
 
-    // console.log(config);
+    const pathL10nJson = path.join(config.path_to_translations_dir, "translation.json");
+    const [jsonError] = await resolver(fs.writeFile(pathL10nJson, l10nJson));
+
+    if (jsonError) {
+        return console.error(jsonError);
+    }
     // console.log(command);
     // console.log(files);
     console.log(l10nCollection);

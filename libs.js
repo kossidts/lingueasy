@@ -39,9 +39,7 @@ function create_translators(lang, localizations) {
      * @param {string} str The string to translate
      * @returns {string} The translated string of the original string in case the translation is missing
      */
-    const __ = str => {
-        localizations[lang]?.[str] || str;
-    };
+    const __ = str => localizations[lang]?.[str] || str;
 
     /**
      * Translate a tring with placeholders

@@ -65,7 +65,9 @@ function create_translators(lang, localizations) {
         return formatted;
     };
 
-    let _translators = translators.set(lang, [__, _f]);
+    let _translators = [__, _f];
+
+    translators.set(lang, _translators);
 
     return _translators;
 }

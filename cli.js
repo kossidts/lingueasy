@@ -69,7 +69,7 @@ async function create_l10n() {
         return console.error(createDirError);
     }
 
-    const projectRootPath = "" + appRoot; //TODO: This is temp for testing
+    const projectRootPath = "" + process.cwd();
     let command = "grep -rlE ";
     command += ` --exclude-dir={${config.exclude_dirs.join(",")}}`;
     command += ` --exclude={${config.exclude_files.join(",")}}`;

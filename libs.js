@@ -7,7 +7,8 @@ const defaultConfig = require("./default.config.js");
 function mergeConfigs() {
     let config = null;
     try {
-        config = require(`${appRoot}/${pkg.name}.config.js`);
+        // require.main.path
+        config = require(`${process.cwd()}/${pkg.name}.config.js`);
     } catch (error) {}
 
     // Merge the config with the default configs

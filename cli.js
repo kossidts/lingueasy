@@ -1,12 +1,38 @@
+#!/usr/bin/env node
+
 const path = require("node:path");
 const fs = require("node:fs/promises");
 const { exec } = require("node:child_process");
 
-const appRoot = require("app-root-path");
 const resolver = require("await-resolver");
 
 const pkg = require("./package.json");
 const { mergeConfigs } = require("./libs.js");
+
+const defined_args = ["generate", "localize"];
+const args = process.argv.slice(2);
+
+if (!args.length || defined_args.indexOf(args[0]) === -1) {
+    console.log("Missing argument:");
+    console.log("\t", path.basename(process.argv[1]), defined_args.join("|"));
+    process.exit();
+}
+const task = args[0];
+
+if (task === "generate") {
+    create_l10n().then(() => {
+        console.log("generated");
+        process.exit();
+    });
+}
+
+if (task === "localize") {
+    if (args.length < 2) {
+        console.log("Missing the lang option: (e.g. en or en_us)");
+        console.log("\t", path.basename(process.argv[1]), "localize <lang>");
+    }
+}
+// process.exit();
 
 /**
  * A helper function to ease running bash commands in async mode

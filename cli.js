@@ -7,7 +7,7 @@ const { exec } = require("node:child_process");
 const resolver = require("await-resolver");
 
 const pkg = require("./package.json");
-const { mergeConfigs } = require("./libs.js");
+const { mergeConfigs, sanitizeLocal, translation_template_name } = require("./libs.js");
 
 const defined_args = ["generate", "localize"];
 const args = process.argv.slice(2);
@@ -20,10 +20,16 @@ if (!args.length || defined_args.indexOf(args[0]) === -1) {
 const task = args[0];
 
 if (task === "generate") {
-    create_l10n().then(() => {
-        console.log("generated");
-        process.exit();
-    });
+    create_l10n()
+        .then(() => {
+            // console.log("generated");
+        })
+        .catch(error => {
+            console.log(error);
+        })
+        .finally(() => {
+            process.exit();
+        });
 }
 
 if (task === "localize") {
@@ -68,6 +74,8 @@ async function create_l10n() {
         // throw createDirError;
         return console.error(createDirError);
     }
+    console.log("Configuation to generate/update translation templates:");
+    console.log(config);
 
     const projectRootPath = "" + process.cwd();
     let command = "grep -rlE ";
@@ -75,6 +83,7 @@ async function create_l10n() {
     command += ` --exclude={${config.exclude_files.join(",")}}`;
     command += ` --include={${config.includes_files.join(",")}}`;
     command += ` "_[_f]\\(" ${projectRootPath}`;
+
     const [cmdError, cmdResults] = await resolver(bash_promise(command));
     if (cmdError) {
         return console.error(cmdError);
@@ -99,6 +108,7 @@ async function create_l10n() {
     let re = new RegExp(/\_[\_|f]\(\s?[\'|\`|\"]((?:.|\n)*?)[\'|\`|\"]\s?(?:\,\s?.*?)?\)/, "gm");
 
     for (const file of files) {
+        console.log("Processing: ", file);
         let [fileContentErr, fileContent] = await resolver(fs.readFile(file, { encoding: "utf-8" }));
         if (fileContentErr) {
             console.error(fileContentErr);
@@ -138,14 +148,22 @@ async function create_l10n() {
     // TODO translform the l10nCollection into a pot template
     let l10nPot = l10nCollection.reduce((acc, cur) => {
         acc += `#: ${cur.lineNumber}\n`;
-        acc += `msgid "${cur.text}"\n`;
-        acc += `msgstr ""\n`;
+        const lines = cur.text.split(/\r?\n/);
+        if (lines.length <= 1) {
+            acc += `msgid "${cur.text}"\n`;
+            acc += `msgstr ""\n`;
+        } else {
+            acc += `msgid ""\n`;
+            for (const line of lines) {
+                acc += `"${line}\\n"\n`;
+            }
+        }
         acc += "\n";
         return acc;
     }, "");
 
-    const pathL10nPot = path.join(config.path_to_translations_dir, "translation.pot");
-    const [potError] = await resolver(fs.writeFile(pathL10nPot, l10nPot));
+    const l10nPot_path = path.join(config.path_to_translations_dir, `${translation_template_name}.pot`);
+    const [potError] = await resolver(fs.writeFile(l10nPot_path, l10nPot));
 
     if (potError) {
         return console.error(potError);
@@ -161,15 +179,15 @@ async function create_l10n() {
     l10nJson = Object.fromEntries(l10nJson);
     l10nJson = JSON.stringify(l10nJson, null, 4);
 
-    const pathL10nJson = path.join(config.path_to_translations_dir, "translation.json");
-    const [jsonError] = await resolver(fs.writeFile(pathL10nJson, l10nJson));
+    const l10nJson_path = path.join(config.path_to_translations_dir, `${translation_template_name}.json`);
+    const [jsonError] = await resolver(fs.writeFile(l10nJson_path, l10nJson));
 
     if (jsonError) {
         return console.error(jsonError);
     }
-    // console.log(command);
-    // console.log(files);
-    console.log(l10nCollection);
+
+    console.log("Done");
+}
 }
 
 create_l10n();

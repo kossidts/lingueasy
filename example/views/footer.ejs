@@ -1,5 +1,39 @@
 </main>
 </div>
 
+<script>
+    const $languageSelector = document.getElementById('site-language');
+    if($languageSelector){
+        $languageSelector.addEventListener('change', switchLanguage)
+    }
+
+    function switchLanguage(event){
+        const $form = event.target.closest('form');
+        const redirectTo = window.location.toString().replace(window.location.origin, '');
+        
+        // Add a hidden input field with the value of the current location,
+        // in order to redirect the client back to the same page after the language has changes
+        const $hiddenInput = document.createElement('input');
+        $hiddenInput.name= 'redirectTo';
+        $hiddenInput.value= redirectTo;
+        $hiddenInput.setAttribute('type', 'hidden');
+        $form.append($hiddenInput);
+        $form.submit()
+
+        // Same process but send the data using fetch...
+        // const formData = new FormData($form);
+        // const url = new URL($form.action, window.location);
+        // for (const [key, value] of formData) {
+        //     url.searchParams.set(key, value)   
+        // }
+        // formData.set('redirectTo', redirectTo);
+
+        // url.searchParams.set('redirectTo', redirectTo);
+        // fetch(url, { method: $form.method || "GET" }).then(res => res.text()).then(payload => {
+        //     console.log(payload);
+        //     window.location.reload()
+        // }).catch(console.error)
+    }
+</script>
 </body>
 </html>

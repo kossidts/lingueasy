@@ -21,7 +21,7 @@ app.get("/", (req, res) => {
     // req.app.locals.lingueasy._f
     // The current language is
     // req.app.locals.lingueasy.lang
-    console.log(req.app.locals);
+    // console.log(req.app.locals.lingueasy);
 
     const _f = req.app.locals._f;
     const __ = req.app.locals.__;

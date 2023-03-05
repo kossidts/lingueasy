@@ -6,37 +6,56 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title><%= title %></title>
         <style>
-            *{ 
-                box-sizing: border-box; 
+            :root {
+                --gray-100: #f8f8f2;
+                --gray-500: #dadada;
+                --gray-800: #272822;
+                --clr-text-light: var(--gray-100);
+                --clr-text: var(--gray-500);
+                --clr-bg: var(--gray-800);
+                --clr-link-light: #44cf6e;
+                --clr-link: #1ae357;
+            }
+            * {
+                box-sizing: border-box;
                 margin: 0;
             }
-            body{
+            body {
                 font-family: helvetica, sans-serif;
                 font-size: 1rem;
-                background-color: #272822;
-                color: #dadada;
+                background-color: var(--clr-bg);
+                color: var(--clr-text);
                 line-height: 1.6;
             }
-            h1, h2{
-                color: #f8f8f2;
+            h1,
+            h2 {
+                color: var(--clr-text-light);
                 line-height: 1.4;
             }
-            h2{
+            h2 {
                 margin-bottom: 1.175em;
             }
-            a{
+            h1.headline-sm {
+                color: var(--clr-link);
+                font-size: 1.35rem;
+            }
+            a {
                 text-decoration: none;
-                color: #1ae357;
+                color: var(--clr-link);
             }
-            a:hover{
-                color: #44CF6E;
+            a:hover {
+                color: var(--clr-link-light);
             }
-            main{
+            .site-wrapper{
                 margin-inline: auto;
-                margin-block-start: 30px;
                 width: 600px;
+                padding-block-start: 30px;
+            }
+            main {
+                margin-block-start: 15px;
             }
         </style>
     </head>
     <body>
-    <main>
+        <div class="site-wrapper">
+        <main>

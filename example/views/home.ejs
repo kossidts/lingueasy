@@ -1,7 +1,9 @@
 <%- include('header'); %>
-<h2>Lingueasy</h2>
-<p class="intro"><%= __('Fast, minimalist and easy to use library for translations.'); %></p>
+<h1 class="headline-sm">Lingueasy</h1>
+<h2><%= __('Code less, write less, reach more clients around the world.'); %></h2>
+<p>
+    <%= __('A fast, minimalist and easy to use library for translations.'); %> <%- _f(`For more documentation visit
+    <a href="%s">the github repo</a>.`, 'https://github.com/kossidts/lingueasy') %>
+</p>
 <p><%= content %></p>
-<p><%= __('Code less, reach more clients around the world.') %></p>
-<p><%- _f('For more documentation visit <a href="%s">the github repo</a>', 'https://github.com/kossidts/lingueasy') %></p>
 <%- include('footer'); %>

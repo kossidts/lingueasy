@@ -1,0 +1,7 @@
+{
+    "A fast, minimalist and easy to use library for translations.": "Eine schnelle, minimalistische und einfach zu verwendende Bibliothek für Übersetzungen.",
+    "Code less, write less, reach more clients around the world.": "Weniger kodieren, weniger schreiben, mehr Kunden in aller Welt erreichen.",
+    "For more documentation visit\n    <a href=\"%s\">the github repo</a>.": "Für weitere Dokumentation besuchen Sie <a href=\"%s\">das Github-Repositorium</a>.",
+    "Language": "Sprache",
+    "The server of this example page is listening on port %2$s.": "Der Server dieser Beispielseite lauscht auf Port %2$s."
+}

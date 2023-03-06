@@ -1,10 +1,13 @@
-const appRoot = require("app-root-path");
+const path = require("node:path");
+const fs = require("node:fs");
+
 const real_typeof = require("@kdts/real-typeof");
 
 const pkg = require("./package.json");
 const defaultConfig = require("./default.config.js");
+const translation_template_name = "translation";
 
-function mergeConfigs() {
+function mergeConfigs(options) {
     let config = null;
     try {
         // require.main.path
@@ -12,13 +15,32 @@ function mergeConfigs() {
     } catch (error) {}
 
     // Merge the config with the default configs
-    config = Object.assign({}, defaultConfig, config);
+    config = Object.assign({}, defaultConfig, config, options);
     config.exclude_dirs = [...new Set(config.exclude_dirs.concat(defaultConfig.exclude_dirs))];
     config.exclude_files = [...new Set(config.exclude_files.concat(defaultConfig.exclude_files))];
     config.includes_files = [...new Set(config.includes_files.concat(defaultConfig.includes_files))];
     config.localizations = {};
+    config.source_lang = sanitizeLocal(config.source_lang || "en");
 
-    // en: {}, // require locals /languages/locals/en.json
+    try {
+        let files = fs.readdirSync(config.path_to_translations_dir);
+        // Filter out everything but the json files
+        files = files.filter(f => f.endsWith(".json") && !f.startsWith(`${translation_template_name}.`));
+        for (const file of files) {
+            const lang = sanitizeLocal(file.split(".")[0]);
+            if (!lang) {
+                continue;
+            }
+            config.localizations[lang] = require(path.join(config.path_to_translations_dir, file));
+        }
+    } catch (error) {
+        // console.log("error", error);
+    }
+
+    if (!config.localizations[config.source_lang]) {
+        config.localizations[config.source_lang] = {};
+    }
+
     return config;
 }
 
@@ -90,6 +112,8 @@ function create_localizer_middleware(config) {
         }
         return false;
     };
+    const languages = Object.keys(localizations);
+
     return (req, res, next) => {
         // Skip if the current route is excluded from being translated
         if (exclude_paths.length && is_excluded(req.originalUrl)) {
@@ -100,13 +124,14 @@ function create_localizer_middleware(config) {
          * Retrieve the current users preferred language from the session.
          * If not available, use one of the avalaible translation language that the users browser supports.
          */
-        let lang = req.session?.lang || req.acceptsLanguages(...Object.keys(localizations));
+        let lang = req.session?.lang || req.acceptsLanguages(...languages);
 
         lang = sanitizeLocal(lang, true);
 
         const [__, _f] = create_translators(lang, localizations);
 
         req.app.locals.lingueasy = {
+            languages,
             lang,
             __,
             _f,
@@ -164,4 +189,5 @@ module.exports = {
     create_localizer_middleware,
     mergeConfigs,
     sanitizeLocal,
+    translation_template_name,
 };

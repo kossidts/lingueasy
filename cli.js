@@ -71,8 +71,6 @@ function bash_promise(cmd) {
     });
 }
 
-const cli = {};
-
 /**
  * Greps translatable files i.e. files containing translation functions like __(), _f()
  * and generates the translation templates
@@ -373,5 +371,3 @@ function deepl_stats() {
         })
         .catch(console.error);
 }
-
-module.exports = cli;

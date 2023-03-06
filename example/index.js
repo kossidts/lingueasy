@@ -12,7 +12,7 @@ app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 // Session middleware have to be set before invoking lingueasy
 app.use(session({ secret: "very-radom-secret-key", resave: false, saveUninitialized: false, httpOnly: true }));
-lingueasy.init(app, {
+lingueasy(app, {
     // source_lang: "en"
 });
 

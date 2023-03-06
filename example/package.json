@@ -7,7 +7,9 @@
         "start": "node index.js",
         "lingueasy:generate": "lingueasy generate",
         "lingueasy:localize:en": "lingueasy localize en",
-        "lingueasy:localize:de": "lingueasy localize de"
+        "lingueasy:localize:de": "lingueasy localize de --deepl",
+        "lingueasy:localize:fr": "lingueasy localize fr --deepl",
+        "lingueasy:localize:es": "lingueasy localize es --deepl"
     },
     "keywords": [],
     "author": "",

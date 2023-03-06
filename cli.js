@@ -5,6 +5,8 @@ const fs = require("node:fs/promises");
 const { exec } = require("node:child_process");
 
 const resolver = require("await-resolver");
+const fetch = (...args) => import("node-fetch").then(({ default: fetch }) => fetch(...args));
+require("dotenv").config();
 
 const pkg = require("./package.json");
 const { mergeConfigs, sanitizeLocal, translation_template_name } = require("./libs.js");
@@ -32,13 +34,18 @@ if (task === "generate") {
         });
 }
 
+let translator = "";
 if (task === "localize") {
     if (args.length < 2) {
         console.log("Missing the lang option: (e.g. en or en_us)");
         console.log("\t", path.basename(process.argv[1]), "localize <lang>");
+        process.exit();
     }
+    if (args[2] && /^\-\-/.test(args[2])) {
+        translator = args[2].slice(2).toLowerCase();
+    }
+
 }
-// process.exit();
 
 /**
  * A helper function to ease running bash commands in async mode
@@ -190,5 +197,97 @@ async function create_l10n() {
 }
 }
 
-create_l10n();
+function get_active_translator() {
+    if (translator === "deepl" && get_deepl_config() != null) {
+        return "deepl";
+    }
+    return "";
+}
+
+function translate(translator, source_lang, target_lang, text) {
+    switch (translator) {
+        case "deepl":
+            return deepl_translate(source_lang, target_lang, text);
+
+        case "":
+        default:
+            return "";
+    }
+}
+
+function get_deepl_config() {
+    if (!process.env.DEEPL_ENDPOINT || !process.env.DEEPL_AUTH_KEY) {
+        console.log("Missing at least one environment variable: the deepl api endpoint (DEEPL_ENDPOINT) or the api key (DEEPL_AUTH_KEY).");
+        return null;
+    }
+
+    return {
+        api_endpoint: process.env.DEEPL_ENDPOINT,
+        requestHeaders: {
+            "User-Agent": "lingueasy",
+            Authorization: `DeepL-Auth-Key ${process.env.DEEPL_AUTH_KEY}`,
+        },
+    };
+}
+
+function deepl_translate(source_lang, target_lang, text) {
+    const deepL = get_deepl_config();
+    if (!deepL) {
+        return Promise.reject(new Error("Probably missing DeepL API Keys"));
+    }
+    const formData = new URLSearchParams();
+    formData.append("source_lang", source_lang);
+    formData.append("preserve_formatting", 1);
+    formData.append("target_lang", target_lang.replace("_", "-"));
+    formData.append("tag_handling", "html");
+    formData.set("text", text);
+
+    return new Promise((resolve, reject) => {
+        fetch(`${deepL.api_endpoint}/translate`, {
+            headers: deepL.requestHeaders,
+            method: "post",
+            body: formData,
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`${response.status}: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(result => {
+                result = result.translations?.[0] || {};
+                if (!result.text) {
+                    return reject(new Error("No translation"));
+                }
+
+                resolve(result.text);
+            });
+        // .catch(reject);
+    });
+}
+
+function deepl_stats() {
+    const deepL = get_deepl_config();
+    if (!deepL) {
+        return;
+    }
+    fetch(`${deepL.api_endpoint}/usage`, { headers: deepL.requestHeaders })
+        .then(response => {
+            if (!response.ok) {
+                // console.log(response);
+                throw new Error(`${response.status}: ${response.statusText}`);
+            }
+            return response.json();
+        })
+        .then(result => {
+            console.log(result);
+            let remainingCharacterCount = result.character_limit - result.character_count;
+            let remaining_percentage = Number(remainingCharacterCount / result.character_limit);
+            let remaining_percentage_formatted = remaining_percentage.toLocaleString("de-DE", { style: "percent", minimumFractionDigits: 2 });
+
+            console.log(`Remaining characters: ${remainingCharacterCount} (${remaining_percentage_formatted})`);
+        })
+        .catch(console.error);
+}
+
 module.exports = cli;

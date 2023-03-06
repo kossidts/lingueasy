@@ -45,6 +45,11 @@ if (task === "localize") {
         translator = args[2].slice(2).toLowerCase();
     }
 
+    localize(args[1]);
+}
+
+function sleep(ms) {
+    return resolver(null, ms);
 }
 
 /**
@@ -195,6 +200,85 @@ async function create_l10n() {
 
     console.log("Done");
 }
+
+async function localize(local, short = true) {
+    local = sanitizeLocal(local);
+    if (!local) {
+        throw new Error("This function requires at least one parameter: The traget language code (a string of 2 or 5 letters e.g. en or en-US)");
+    }
+
+    // Generate/update the templates
+    await create_l10n();
+
+    const config = mergeConfigs();
+    /**
+     * Try to keep old translations.
+     * I.e. when generating a localization file (e.g. en.json) check if such file already exists.
+     * If so keep the translations to reduce potential API ressorces
+     */
+    const l10nJson_path = path.resolve(config.path_to_translations_dir, `${local}.json`);
+    let l10nJson = {};
+    try {
+        l10nJson = require(l10nJson_path);
+    } catch (error) {}
+    // console.log(l10nJson);
+    l10nJson = new Map(Object.entries(l10nJson));
+
+    /**
+     * Iterate over the (updated) translatable texts and:
+     * - If a text (key) is missing in the translation (i.e. l10nJson) add the text to it
+     * - If the value of a translation is empty use an API like deepl to translate it.
+     */
+    let l10nJson_template = require(path.resolve(config.path_to_translations_dir, `${translation_template_name}.json`));
+    let l10nJson_template_entries = Object.entries(l10nJson_template);
+
+    let total_translatable = l10nJson_template_entries.length;
+    let translated = [...l10nJson.entries()].filter(([key, value]) => typeof value == "string" && value.trim().length);
+    let total_translated = translated.length;
+    let total_translations = total_translatable - total_translated;
+
+    const active_translator = get_active_translator();
+
+    let translationsCount = 1;
+    for (const [key, value] of l10nJson_template_entries) {
+        if (!l10nJson.has(key)) {
+            l10nJson.set(key, value);
+        }
+
+        if (key.length && !l10nJson.get(key).trim().length) {
+            console.log(`Translating ${translationsCount}/${total_translations}: ${key}`);
+            let [err, translation] = await resolver(translate(active_translator, config.source_lang, local, key));
+
+            if (!err) {
+                l10nJson.set(key, translation);
+            } else {
+                console.log(err);
+            }
+            translationsCount++;
+            if (active_translator) {
+                console.log("Waiting 2 seconds to continue");
+                await sleep(2 * 1000);
+            }
+        }
+    }
+
+    // Sort alphabetically
+    l10nJson = [...l10nJson.entries()].sort((a, b) => {
+        let keyA = a[0].toLowerCase();
+        let keyB = b[0].toLowerCase();
+        return keyA > keyB ? 1 : keyA < keyB ? -1 : 0;
+    });
+
+    // Save to file
+    l10nJson = JSON.stringify(Object.fromEntries(l10nJson), null, 4);
+    const [l10nJson_err] = await resolver(fs.writeFile(l10nJson_path, l10nJson));
+    if (l10nJson_err) {
+        throw l10nJson_err;
+    }
+
+    // if (active_translator === 'deepl') {
+    //     deepl_stats();
+    // }
 }
 
 function get_active_translator() {

@@ -1,7 +1,7 @@
 {
     "name": "lingueasy",
     "version": "0.1.0",
-    "description": "",
+    "description": "A fast, minimalist and easy to use library for translations. Code less, write less, reach more clients around the world.",
     "main": "index.js",
     "bin": {
         "lingueasy": "./cli.js"
@@ -9,15 +9,46 @@
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
     },
-    "type": "commonjs",
-    "keywords": [],
     "author": "Kossi D. T. S.",
-    "license": "ISC",
+    "license": "MIT",
+    "type": "commonjs",
+    "exports": {
+        "import": "./wrapper.mjs",
+        "require": "./index.js"
+    },
+    "files": [
+        "index.js",
+        "wrapper.mjs",
+        "cli.js"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/lingueasy/intval.git"
+    },
+    "homepage": "https://github.com/lingueasy/intval#readme",
+    "bugs": {
+        "url": "https://github.com/lingueasy/intval/issues"
+    },
     "dependencies": {
         "@kdts/real-typeof": "^1.0.4",
         "app-root-path": "^3.1.0",
         "await-resolver": "^1.1.1",
         "dotenv": "^16.0.3",
         "node-fetch": "^3.3.0"
-    }
+    },
+    "keywords": [
+        "lingueasy",
+        "i18n",
+        "l10n",
+        "translation",
+        "translate",
+        "localisation",
+        "localization",
+        "internationalization",
+        "internationalisation",
+        "multilingual",
+        "deepl",
+        "language",
+        "express"
+    ]
 }

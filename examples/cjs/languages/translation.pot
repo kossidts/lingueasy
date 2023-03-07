@@ -1,4 +1,4 @@
-#: index.js:34
+#: index.js:35
 msgid "The server of this example page is listening on port %2$s."
 msgstr ""
 
@@ -17,5 +17,9 @@ msgid ""
 
 #: views/header.ejs:77
 msgid "Language"
+msgstr ""
+
+#: views/footer.ejs:1
+msgid "The type of this project is: %s."
 msgstr ""
 

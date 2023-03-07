@@ -4,6 +4,7 @@ const fs = require("node:fs");
 const express = require("express");
 const session = require("express-session");
 const lingueasy = require("lingueasy");
+const pkg = require("./package.json");
 
 const app = express();
 const port = 8823;
@@ -32,6 +33,7 @@ app.get("/", (req, res) => {
     res.render("home", {
         title: "Translate With Lingueasy",
         content: _f("The server of this example page is listening on port %2$s.", 100, port),
+        module_type: pkg.type,
     });
 });
 

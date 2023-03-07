@@ -11,6 +11,7 @@
         "lingueasy:localize:fr": "lingueasy localize fr --deepl",
         "lingueasy:localize:es": "lingueasy localize es --deepl"
     },
+    "type": "commonjs",
     "keywords": [],
     "author": "",
     "license": "ISC",
@@ -18,6 +19,6 @@
         "ejs": "^3.1.8",
         "express": "^4.18.2",
         "express-session": "^1.17.3",
-        "lingueasy": "file:.."
+        "lingueasy": "file:../.."
     }
 }

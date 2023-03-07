@@ -19,7 +19,8 @@
     "files": [
         "index.js",
         "wrapper.mjs",
-        "cli.js"
+        "cli.js",
+        "libs.js"
     ],
     "repository": {
         "type": "git",

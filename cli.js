@@ -253,7 +253,7 @@ async function localize(local, short = true) {
                 console.log(err);
             }
             translationsCount++;
-            if (active_translator) {
+            if (active_translator && translationsCount < total_translations) {
                 console.log("Waiting 2 seconds to continue");
                 await sleep(2 * 1000);
             }

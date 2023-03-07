@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title><%= title %></title>
+        <style>
+            :root {
+                --gray-100: #f8f8f2;
+                --gray-500: #dadada;
+                --gray-800: #272822;
+                --clr-text-light: var(--gray-100);
+                --clr-text: var(--gray-500);
+                --clr-bg: var(--gray-800);
+                --clr-link-light: #44cf6e;
+                --clr-link: #1ae357;
+            }
+            * {
+                box-sizing: border-box;
+                margin: 0;
+            }
+            body {
+                font-family: helvetica, sans-serif;
+                font-size: 1rem;
+                background-color: var(--clr-bg);
+                color: var(--clr-text);
+                line-height: 1.6;
+            }
+            h1,
+            h2 {
+                color: var(--clr-text-light);
+                line-height: 1.4;
+            }
+            h2 {
+                margin-bottom: 1.175em;
+            }
+            h1.headline-sm {
+                color: var(--clr-link);
+                font-size: 1.35rem;
+            }
+            a {
+                text-decoration: none;
+                color: var(--clr-link);
+            }
+            a:hover {
+                color: var(--clr-link-light);
+            }
+            .site-wrapper{
+                margin-inline: auto;
+                width: 600px;
+                padding-block-start: 30px;
+            }
+            select{
+                color: var(--clr-text-light);
+                background-color: var(--clr-bg);
+                border: 1px solid transparent;
+                /* border-radius: 3px; */
+                font-size: 1rem;
+                padding: 0.3em 0.5em;
+            }
+            header form{
+                display:flex;
+                justify-content: flex-end;
+            }
+            main {
+                margin-block-start: 15px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="site-wrapper">
+        <header>
+        <% if(lingueasy.languages.length > 1) { %>
+            <form action="/switch-language" method="GET">
+                <div class="input-group">
+                    <label for="site-language"><%= __('Language') %>:</label>
+                    <select name="lang" id="site-language">
+                        <% for (const lang of lingueasy.languages) { %>
+                            <option value="<%= lang %>" <%= lang === lingueasy.lang? 'selected=selected' : '' %>><%= lang %></option>
+                        <% } %>
+                    </select>
+                </div>
+            </form>
+        <% } %>
+        </header>
+        <main>

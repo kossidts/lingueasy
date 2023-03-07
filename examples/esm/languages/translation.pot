@@ -1,0 +1,25 @@
+#: index.js:39
+msgid "The server of this example page is listening on port %2$s."
+msgstr ""
+
+#: views/home.ejs:3
+msgid "Code less, write less, reach more clients around the world."
+msgstr ""
+
+#: views/home.ejs:5
+msgid "A fast, minimalist and easy to use library for translations."
+msgstr ""
+
+#: views/home.ejs:5
+msgid ""
+"For more documentation visit\n"
+"    <a href="%s">the github repo</a>.\n"
+
+#: views/header.ejs:77
+msgid "Language"
+msgstr ""
+
+#: views/footer.ejs:1
+msgid "The type of this project is: %s."
+msgstr ""
+

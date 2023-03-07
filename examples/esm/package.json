@@ -1,0 +1,24 @@
+{
+    "name": "esm",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "start": "node index.js",
+        "lingueasy:generate": "lingueasy generate",
+        "lingueasy:localize:en": "lingueasy localize en",
+        "lingueasy:localize:de": "lingueasy localize de --deepl",
+        "lingueasy:localize:fr": "lingueasy localize fr --deepl",
+        "lingueasy:localize:es": "lingueasy localize es --deepl"
+    },
+    "type": "module",
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "ejs": "^3.1.8",
+        "express": "^4.18.2",
+        "express-session": "^1.17.3",
+        "lingueasy": "file:../.."
+    }
+}

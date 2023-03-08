@@ -1,6 +1,6 @@
 {
     "name": "lingueasy",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "A fast, minimalist and easy to use library for translations. Code less, write less, reach more clients around the world.",
     "main": "index.js",
     "bin": {

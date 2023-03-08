@@ -1,6 +1,5 @@
 const path = require("node:path");
 const fs = require("node:fs");
-
 const real_typeof = require("@kdts/real-typeof");
 
 const pkg = require("./package.json");
@@ -10,9 +9,20 @@ const translation_template_name = "translation";
 function mergeConfigs(options) {
     let config = null;
     try {
-        // require.main.path
-        config = require(`${process.cwd()}/${pkg.name}.config.js`);
-    } catch (error) {}
+        const configCjs = `${process.cwd()}/${pkg.name}.config.cjs`;
+        const configJs = `${process.cwd()}/${pkg.name}.config.js`;
+        if (fs.existsSync(configCjs)) {
+            config = require(configCjs);
+        } else {
+            config = require(configJs);
+        }
+    } catch (error) {
+        if (error.code !== "MODULE_NOT_FOUND") {
+            console.log(`\n%c${pkg.name}: config file error:`, "color: #dd0000");
+            console.log(error);
+            console.log(`\n${pkg.name}: You might with to create a commonJs config file '${pkg.name}.config.cjs' to export the configuration\n`);
+        }
+    }
 
     // Merge the config with the default configs
     config = Object.assign({}, defaultConfig, config, options);

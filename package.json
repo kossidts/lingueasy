@@ -24,11 +24,11 @@
     ],
     "repository": {
         "type": "git",
-        "url": "https://github.com/lingueasy/intval.git"
+        "url": "https://github.com/kossidts/lingueasy.git"
     },
-    "homepage": "https://github.com/lingueasy/intval#readme",
+    "homepage": "https://github.com/kossidts/lingueasy#readme",
     "bugs": {
-        "url": "https://github.com/lingueasy/intval/issues"
+        "url": "https://github.com/kossidts/lingueasy/issues"
     },
     "dependencies": {
         "@kdts/real-typeof": "^1.0.4",

@@ -118,13 +118,13 @@ __("For more documentation visit") + ' <a href="https://example.com">' + __("the
 The sentence is splitted into parts which give the translator with no context. A slighly better approch would be
 
 ```js
-_f("For more documentation visit %1$s the github repo %2$s", '<a href="https://example.de">', "</a>");
+_f("For more documentation visit %1$s the github repo %2$s", '<a href="https://example.com">', "</a>");
 ```
 
 But it's hard to understand the role of the placeholders. A better way to make this sentence translatable would be
 
 ```js
-_f('For more documentation visit <a href="%s">the github repo</a>', "https://example.de");
+_f('For more documentation visit <a href="%s">the github repo</a>', "https://example.com");
 ```
 
 since most translation tools can handle html markups correctly i.e. they will not translate HTML/XML markups.

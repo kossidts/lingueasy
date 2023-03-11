@@ -18,9 +18,8 @@ function mergeConfigs(options) {
         }
     } catch (error) {
         if (error.code !== "MODULE_NOT_FOUND") {
-            console.log(`\n%c${pkg.name}: config file error:`, "color: #dd0000");
             console.log(error);
-            console.log(`\n${pkg.name}: You might with to create a commonJs config file '${pkg.name}.config.cjs' to export the configuration\n`);
+            console.log(`\n${pkg.name}: You may need to create a commonJs config file '${pkg.name}.config.cjs' to export the configuration\n`);
         }
     }
 

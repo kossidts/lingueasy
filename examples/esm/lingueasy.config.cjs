@@ -1,5 +1,5 @@
 const config = {
-    source_lang: "es",
+    source_lang: "en",
 };
 
 // export default config;

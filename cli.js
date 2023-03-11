@@ -6,6 +6,7 @@ const { exec } = require("node:child_process");
 
 const resolver = require("await-resolver");
 const fetch = (...args) => import("node-fetch").then(({ default: fetch }) => fetch(...args));
+const { createSpinner } = require("nanospinner");
 require("dotenv").config();
 
 const pkg = require("./package.json");
@@ -85,7 +86,9 @@ async function create_l10n() {
         return console.error(createDirError);
     }
     console.log("Configuation to generate/update translation templates:");
-    console.log(config);
+    const _config = { ...config };
+    delete _config.localizations;
+    console.log(_config);
 
     const projectRootPath = "" + process.cwd();
     let command = "grep -rlE ";
@@ -118,9 +121,11 @@ async function create_l10n() {
     let re = new RegExp(/\_[\_|f]\(\s?[\'|\`|\"]((?:.|\n)*?)[\'|\`|\"]\s?(?:\,\s?.*?)?\)/, "gm");
 
     for (const file of files) {
-        console.log("Processing: ", file);
+        // console.log("Processing: ", file);
+        const spinner = createSpinner(`Processing: ${file}`).start();
         let [fileContentErr, fileContent] = await resolver(fs.readFile(file, { encoding: "utf-8" }));
         if (fileContentErr) {
+            spinner.error();
             console.error(fileContentErr);
             continue;
         }
@@ -153,8 +158,10 @@ async function create_l10n() {
                 });
             }
         });
+        spinner.success();
     }
 
+    const spinner = createSpinner(`Create translation templates`).start();
     // TODO translform the l10nCollection into a pot template
     let l10nPot = l10nCollection.reduce((acc, cur) => {
         acc += `#: ${cur.lineNumber}\n`;
@@ -176,6 +183,7 @@ async function create_l10n() {
     const [potError] = await resolver(fs.writeFile(l10nPot_path, l10nPot));
 
     if (potError) {
+        spinner.error();
         return console.error(potError);
     }
     /**
@@ -193,10 +201,11 @@ async function create_l10n() {
     const [jsonError] = await resolver(fs.writeFile(l10nJson_path, l10nJson));
 
     if (jsonError) {
+        spinner.error();
         return console.error(jsonError);
     }
 
-    console.log("Done");
+    spinner.success();
 }
 
 async function localize(local, short = true) {
@@ -244,18 +253,21 @@ async function localize(local, short = true) {
         }
 
         if (key.length && !l10nJson.get(key).trim().length) {
-            console.log(`Translating ${translationsCount}/${total_translations}: ${key}`);
+            const translate_spinner = createSpinner(`Translating ${translationsCount}/${total_translations}: ${key}`).start();
             let [err, translation] = await resolver(translate(active_translator, config.source_lang, local, key));
 
             if (!err) {
                 l10nJson.set(key, translation);
+                translate_spinner.success();
             } else {
                 console.log(err);
+                translate_spinner.error();
             }
             translationsCount++;
             if (active_translator && translationsCount < total_translations) {
-                console.log("Waiting 2 seconds to continue");
-                await sleep(2 * 1000);
+                const sleep_spinner = createSpinner("Waiting 2 seconds to continue").start();
+                await sleep(2000);
+                sleep_spinner.success();
             }
         }
     }
